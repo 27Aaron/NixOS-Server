@@ -2,7 +2,14 @@
   description = "Aaron's NixOS flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    preservation.url = "github:nix-community/preservation";
 
     disko = {
       url = "github:nix-community/disko";
@@ -12,19 +19,18 @@
 
   outputs =
     inputs@{
+      self,
       nixpkgs,
-      disko,
       ...
     }:
+    let
+      inherit (nixpkgs) lib;
+      forEachSystem = lib.genAttrs lib.systems.flakeExposed;
+    in
     {
-      nixosConfigurations = {
-        beelink = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            ./configuration.nix
-            disko.nixosModules.disko
-          ];
-        };
-      };
+      nixosConfigurations = import ./hosts { inherit self inputs lib; };
+
+      # nix code formatter
+      formatter = forEachSystem (system: nixpkgs.legacyPackages.${system}.alejandra);
     };
 }
