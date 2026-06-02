@@ -15,6 +15,16 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    my-secrets = {
+      url = "git+ssh://git@github.com/27Aaron/nix-secrets.git?shallow=1";
+      flake = false;
+    };
   };
 
   outputs =
@@ -28,6 +38,7 @@
       forEachSystem = lib.genAttrs lib.systems.flakeExposed;
     in
     {
+      nixosModules = import ./modules { inherit lib; };
       nixosConfigurations = import ./hosts { inherit self inputs lib; };
 
       # nix code formatter

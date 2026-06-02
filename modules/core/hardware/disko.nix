@@ -1,0 +1,149 @@
+{
+  lib,
+  config,
+  inputs,
+  ...
+}:
+let
+  cfg = config.hardware'.disko;
+
+  btrfsSubvolumes = {
+    "@nix" = {
+      mountpoint = "/nix";
+      mountOptions = [
+        "compress=zstd"
+        "noatime"
+      ];
+    };
+    "@persistent" = {
+      mountpoint = "/persistent";
+      mountOptions = [
+        "compress=zstd"
+        "noatime"
+      ];
+    };
+    "@snapshots" = {
+      mountpoint = "/snapshots";
+      mountOptions = [
+        "compress=zstd"
+        "noatime"
+      ];
+    };
+    "@tmp" = {
+      mountpoint = "/tmp";
+      mountOptions = [
+        "compress=zstd"
+        "noatime"
+      ];
+    };
+  };
+in
+{
+  imports = [ inputs.disko.nixosModules.disko ];
+
+  options.hardware'.disko = {
+    enable = lib.mkEnableOption "enable disko disk management";
+
+    device = lib.mkOption {
+      type = lib.types.str;
+      example = "/dev/vda";
+      description = "Disk device path";
+    };
+
+    luks.enable = lib.mkEnableOption "LUKS encryption";
+  };
+
+  config = lib.mkIf cfg.enable {
+    fileSystems."/persistent".neededForBoot = true;
+
+    disko.devices = {
+      nodev."/" = {
+        fsType = "tmpfs";
+        mountOptions = [
+          "nodev"
+          "nosuid"
+          "relatime"
+          "mode=755"
+          "size=16G"
+        ];
+      };
+
+      disk.main = {
+        type = "disk";
+        device = cfg.device;
+        content = {
+          type = "gpt";
+          partitions = {
+            boot = {
+              size = "1M";
+              type = "EF02";
+              priority = 0;
+            };
+            esp = {
+              size = "2G";
+              type = "EF00";
+              content = {
+                type = "filesystem";
+                format = "vfat";
+                mountpoint = "/boot";
+                extraArgs = [
+                  "-n"
+                  "BOOT"
+                ];
+                mountOptions = [ "umask=0077" ];
+              };
+            };
+          }
+          // (
+            if cfg.luks.enable then
+              {
+                luks = {
+                  size = "100%";
+                  type = "8309";
+                  content = {
+                    type = "luks";
+                    name = "crypted";
+                    settings = {
+                      allowDiscards = true;
+                      bypassWorkqueues = true;
+                      crypttabExtraOpts = [
+                        "same-cpu-crypt"
+                        "submit-from-crypt-cpus"
+                      ];
+                    };
+                    initrdUnlock = true;
+                    content = {
+                      type = "btrfs";
+                      extraArgs = [
+                        "-f"
+                        "--csum xxhash64"
+                        "--label NixOS"
+                        "--features"
+                        "block-group-tree"
+                      ];
+                      subvolumes = btrfsSubvolumes;
+                    };
+                  };
+                };
+              }
+            else
+              {
+                nix = {
+                  size = "100%";
+                  content = {
+                    type = "btrfs";
+                    extraArgs = [
+                      "-f"
+                      "--csum xxhash64"
+                      "--label NixOS"
+                    ];
+                    subvolumes = btrfsSubvolumes;
+                  };
+                };
+              }
+          );
+        };
+      };
+    };
+  };
+}
