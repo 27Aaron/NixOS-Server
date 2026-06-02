@@ -35,5 +35,12 @@
     ];
   };
 
+  # Hardware
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  hardware'.disko = {
+    enable = true;
+    luks.enable = true;
+    device = "/dev/nvme0n1";
+  };
 }
