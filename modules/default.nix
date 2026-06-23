@@ -18,6 +18,6 @@
     ];
 in {
   default = {
-    imports = (listModules ./core) ++ (listModules ./server);
+    imports = (listModules ./core) ++ (listModules ./desktop) ++ (listModules ./server);
   };
 }
