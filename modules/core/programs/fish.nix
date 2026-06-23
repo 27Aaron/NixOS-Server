@@ -12,6 +12,9 @@
 
   hm'.programs.fish = {
     enable = true;
+    shellAliases = {
+      cat = "bat";
+    };
   };
 
   preservation'.user.directories = [
