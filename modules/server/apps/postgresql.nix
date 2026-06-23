@@ -3,12 +3,10 @@
   pkgs,
   config,
   ...
-}:
-let
+}: let
   cfg = config.services'.postgresql;
   user = config.core'.userName;
-in
-{
+in {
   options.services'.postgresql = {
     enable = lib.mkEnableOption "Enable PostgreSQL service";
     openFirewall = lib.mkEnableOption "Open firewall port for PostgreSQL";
@@ -69,7 +67,7 @@ in
       '';
     };
 
-    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ 5432 ];
+    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [5432];
 
     preservation'.os.directories = [
       "/var/lib/postgresql"

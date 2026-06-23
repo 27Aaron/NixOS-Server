@@ -3,11 +3,9 @@
   config,
   inputs,
   ...
-}:
-let
+}: let
   cfg = config.containers'.sub-store;
-in
-{
+in {
   options.containers'.sub-store = {
     enable = lib.mkEnableOption "Enable sub-store web server";
 
@@ -36,7 +34,7 @@ in
         hostname = "sub-store";
         serviceName = "sub-store";
         image = "xream/sub-store:http-meta";
-        ports = [ "127.0.0.1:3001:3001" ];
+        ports = ["127.0.0.1:3001:3001"];
         environmentFiles = [
           config.sops.templates."sub-store.env".path
         ];
@@ -48,7 +46,7 @@ in
           SUB_STORE_FRONTEND_HOST = "0.0.0.0";
           SUB_STORE_FRONTEND_PORT = "3001";
         };
-        volumes = [ "/var/lib/sub-store:/opt/app/data" ];
+        volumes = ["/var/lib/sub-store:/opt/app/data"];
         extraOptions = [
           "--tty"
           "--interactive"

@@ -2,11 +2,9 @@
   lib,
   config,
   ...
-}:
-let
+}: let
   cfg = config.services'.dae;
-in
-{
+in {
   options.services'.dae = {
     enable = lib.mkEnableOption "Enable Dae service";
   };

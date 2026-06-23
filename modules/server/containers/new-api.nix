@@ -2,11 +2,9 @@
   lib,
   config,
   ...
-}:
-let
+}: let
   cfg = config.containers'.new-api;
-in
-{
+in {
   options.containers'.new-api = {
     enable = lib.mkEnableOption "Enable new-api container";
 
@@ -38,7 +36,7 @@ in
   config = lib.mkIf cfg.enable {
     # PostgreSQL
     services.postgresql = {
-      ensureDatabases = [ "new-api" ];
+      ensureDatabases = ["new-api"];
       ensureUsers = [
         {
           name = "new-api";

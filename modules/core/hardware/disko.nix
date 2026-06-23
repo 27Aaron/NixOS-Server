@@ -3,8 +3,7 @@
   config,
   inputs,
   ...
-}:
-let
+}: let
   cfg = config.hardware'.disko;
 
   btrfsSubvolumes = {
@@ -37,9 +36,8 @@ let
       ];
     };
   };
-in
-{
-  imports = [ inputs.disko.nixosModules.disko ];
+in {
+  imports = [inputs.disko.nixosModules.disko];
 
   options.hardware'.disko = {
     enable = lib.mkEnableOption "enable disko disk management";
@@ -73,30 +71,31 @@ in
         device = cfg.device;
         content = {
           type = "gpt";
-          partitions = {
-            boot = {
-              size = "1M";
-              type = "EF02";
-              priority = 0;
-            };
-            esp = {
-              size = "2G";
-              type = "EF00";
-              content = {
-                type = "filesystem";
-                format = "vfat";
-                mountpoint = "/boot";
-                extraArgs = [
-                  "-n"
-                  "BOOT"
-                ];
-                mountOptions = [ "umask=0077" ];
+          partitions =
+            {
+              boot = {
+                size = "1M";
+                type = "EF02";
+                priority = 0;
               };
-            };
-          }
-          // (
-            if cfg.luks.enable then
-              {
+              esp = {
+                size = "2G";
+                type = "EF00";
+                content = {
+                  type = "filesystem";
+                  format = "vfat";
+                  mountpoint = "/boot";
+                  extraArgs = [
+                    "-n"
+                    "BOOT"
+                  ];
+                  mountOptions = ["umask=0077"];
+                };
+              };
+            }
+            // (
+              if cfg.luks.enable
+              then {
                 luks = {
                   size = "100%";
                   type = "8309";
@@ -126,8 +125,7 @@ in
                   };
                 };
               }
-            else
-              {
+              else {
                 nix = {
                   size = "100%";
                   content = {
@@ -141,7 +139,7 @@ in
                   };
                 };
               }
-          );
+            );
         };
       };
     };

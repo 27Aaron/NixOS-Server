@@ -4,11 +4,9 @@
   config,
   inputs,
   ...
-}:
-let
+}: let
   cfg = config.services'.redis;
-in
-{
+in {
   options.services'.redis = {
     enable = lib.mkEnableOption "Enable Redis service";
 
@@ -37,7 +35,10 @@ in
       package = pkgs.valkey;
       servers.${cfg.name} = {
         enable = true;
-        bind = if cfg.openFirewall then "0.0.0.0" else "127.0.0.1";
+        bind =
+          if cfg.openFirewall
+          then "0.0.0.0"
+          else "127.0.0.1";
         port = cfg.port;
         logLevel = "notice";
         logfile = "\"\"";
@@ -82,7 +83,7 @@ in
       };
     };
 
-    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ cfg.port ];
+    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [cfg.port];
 
     systemd.tmpfiles.rules = [
       "d /var/lib/redis-${cfg.name} 0700 redis-${cfg.name} redis-${cfg.name} -"

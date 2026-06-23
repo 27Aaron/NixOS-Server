@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   hm'.home.packages = with pkgs; [
     # Archive
     p7zip

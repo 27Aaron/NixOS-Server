@@ -3,12 +3,10 @@
   pkgs,
   config,
   ...
-}:
-let
+}: let
   cfg = config.services'.podman;
   user = config.core'.userName;
-in
-{
+in {
   options.services'.podman = {
     enable = lib.mkEnableOption "Enable Podman container engine";
   };
@@ -21,7 +19,7 @@ in
       autoPrune = {
         enable = true;
         dates = "weekly";
-        flags = [ "--all" ];
+        flags = ["--all"];
       };
     };
 
@@ -32,7 +30,7 @@ in
       podman-compose
     ];
 
-    users.users.${user}.extraGroups = [ "podman" ];
+    users.users.${user}.extraGroups = ["podman"];
 
     preservation' = {
       os.directories = [

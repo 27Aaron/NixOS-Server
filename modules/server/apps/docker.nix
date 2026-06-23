@@ -3,12 +3,10 @@
   pkgs,
   config,
   ...
-}:
-let
+}: let
   cfg = config.services'.docker;
   user = config.core'.userName;
-in
-{
+in {
   options.services'.docker = {
     enable = lib.mkEnableOption "Enable Docker container engine";
   };
@@ -31,11 +29,11 @@ in
       lazydocker # Docker terminal UI.
     ];
 
-    users.users.${user}.extraGroups = [ "docker" ];
+    users.users.${user}.extraGroups = ["docker"];
 
     preservation' = {
-      os.directories = [ "/var/lib/docker" ];
-      user.directories = [ ".local/share/docker" ];
+      os.directories = ["/var/lib/docker"];
+      user.directories = [".local/share/docker"];
     };
   };
 }
