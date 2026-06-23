@@ -14,7 +14,7 @@
     };
     config = {
       # pager = "less -FR";
-      theme = "Rose Pine";
+      theme = "RosePine";
     };
   };
 }
